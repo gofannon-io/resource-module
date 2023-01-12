@@ -1,0 +1,18 @@
+plugins {
+    id 'application'
+}
+
+
+repositories {
+     mavenCentral()
+}
+
+
+application {
+    mainModule='theapp_c'
+    mainClass='com.example.resource_module.theapp.HelloApp'
+}
+
+dependencies {
+    implementation "commons-io:commons-io:2.11.0"
+}

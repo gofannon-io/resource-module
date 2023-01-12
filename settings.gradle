@@ -1,0 +1,11 @@
+
+include(":theapp_a")
+include(":theapp_b")
+include(":theapp_c")
+include(":lib_d")
+
+
+
+include(":theapp")
+include(":liba")
+include(":libb")

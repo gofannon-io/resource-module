@@ -1,0 +1,17 @@
+plugins {
+    id 'application'
+}
+
+
+repositories {
+     mavenCentral()
+}
+
+
+application {
+    mainModule='theapp_a'
+    mainClass='com.example.resource_module.theapp.HelloApp'
+}
+
+dependencies {
+}
