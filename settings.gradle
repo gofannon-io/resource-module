@@ -1,11 +1,9 @@
 
 include(":theapp_a")
 include(":theapp_b")
+include(":lib_b")
 include(":theapp_c")
-include(":lib_d")
+include(":theapp_d")
+include(":theapp_e")
 
 
-
-include(":theapp")
-include(":liba")
-include(":libb")

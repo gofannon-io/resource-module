@@ -1,1 +1,0 @@
-Resource in Root Package of lib D

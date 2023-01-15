@@ -10,7 +10,7 @@ repositories {
 
 application {
     mainModule='theapp_a'
-    mainClass='com.example.resource_module.theapp.HelloApp'
+    mainClass='com.example.resource_module.theapp.HelloAppA'
 }
 
 dependencies {

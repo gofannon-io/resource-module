@@ -7,16 +7,16 @@ repositories {
     maven {
         url = uri("${buildDir}/../../publishing-repository")
     }
-    mavenCentral()
+     mavenCentral()
 }
 
 
 application {
-    mainModule = 'theappb'
-    mainClass = 'com.example.resource_module.theapp.HelloAppB'
+    mainModule='theappe'
+    mainClass='com.example.resource_module.theapp.HelloAppE'
 }
 
 dependencies {
-    //implementation "com.example.resource_module:lib_b:1.0"
+    implementation "commons-io:commons-io:2.11.0"
     implementation project(":lib_b")
 }

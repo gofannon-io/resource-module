@@ -1,1 +1,0 @@
-Resource in Exported Package of lib D

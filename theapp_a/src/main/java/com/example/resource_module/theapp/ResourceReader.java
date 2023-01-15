@@ -12,7 +12,7 @@ public class ResourceReader {
              InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)
         ) {
             StringBuilder stringBuilder = new StringBuilder();
-            char[] buffer = new char[100];
+            char[] buffer = new char[1000];
             int size;
             while ((size = reader.read(buffer)) >= 0) {
                 stringBuilder.append(buffer, 0, size);
@@ -20,7 +20,4 @@ public class ResourceReader {
             return stringBuilder.toString();
         }
     }
-
-
-
 }

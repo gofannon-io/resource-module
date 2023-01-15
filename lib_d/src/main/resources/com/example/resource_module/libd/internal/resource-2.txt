@@ -1,1 +1,0 @@
-Resource in Internal Package of lib D

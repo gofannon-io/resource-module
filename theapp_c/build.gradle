@@ -12,12 +12,11 @@ repositories {
 
 
 application {
-    mainModule='theapp_b'
-    mainClass='com.example.resource_module.theapp.HelloApp'
+    mainModule='theappc'
+    mainClass='com.example.resource_module.theapp.HelloAppC'
 }
 
 dependencies {
-    implementation "commons-io:commons-io:2.11.0"
-    //implementation project(":lib_d")
-    implementation "com.example.resource_module:lib_d:1.0-SNAPSHOT"
+    //implementation "commons-io:commons-io:2.11.0"
+    implementation project(":lib_b")
 }
