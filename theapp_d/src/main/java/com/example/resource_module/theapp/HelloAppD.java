@@ -1,13 +1,9 @@
 package com.example.resource_module.theapp;
 
-import com.example.resource_module.lib_b.Sample;
-
 import java.io.IOException;
 
 public class HelloAppD {
     public static void main(String[] args) throws IOException {
-        new Sample();
-
         checkResource("Root package", "/resource-0.txt");
         checkResource("Exported package", "/com/example/resource_module/lib_b/resource-1.txt");
         checkResource("Internal package", "/com/example/resource_module/lib_b/internal/resource-2.txt");
