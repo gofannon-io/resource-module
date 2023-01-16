@@ -1,13 +1,12 @@
 package com.example.resource_module.theapp;
 
-import com.example.resource_module.lib_b.Sample;
+import com.example.resource_module.lib_b.ExportedSample;
 
 import java.io.IOException;
-import java.net.URL;
 
 public class HelloAppC {
     public static void main(String[] args) throws IOException {
-        new Sample();
+        new ExportedSample();
 
         checkResource("Root package", "/resource-0.txt");
         checkResource("Exported package", "/com/example/resource_module/lib_b/resource-1.txt");

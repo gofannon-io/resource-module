@@ -1,0 +1,22 @@
+plugins {
+    id 'application'
+}
+
+
+repositories {
+    maven {
+        url = uri("${buildDir}/../../publishing-repository")
+    }
+     mavenCentral()
+}
+
+
+application {
+    mainModule='theappf'
+    mainClass='com.example.resource_module.theapp.HelloAppF'
+}
+
+dependencies {
+    implementation "commons-io:commons-io:2.11.0"
+    implementation project(":lib_b")
+}

@@ -109,7 +109,27 @@ Les tests à effectuer étant locaux, ils sont assez simples&nbsp;:
 
 On note que tous les résultats sont OK, car la notion de module n'a pas cours au sein d'un même module.
 
-Tout le code source est disponible dans le projet [theapp_a](./theapp_a/)
+Tout le code source est disponible dans le projet [theapp_a](./theapp_a/).
+
+Code source de la méthode de chargement des ressources (theapp)
+```java
+public class ResourceReader {
+
+    public static String loadAsString(String resourcePath) throws IOException {
+        try (InputStream in = ResourceReader.class.getResourceAsStream(resourcePath);
+             InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)
+        ) {
+            StringBuilder stringBuilder = new StringBuilder();
+            char[] buffer = new char[1000];
+            int size;
+            while ((size = reader.read(buffer)) >= 0) {
+                stringBuilder.append(buffer, 0, size);
+            }
+            return stringBuilder.toString();
+        }
+    }
+}
+```
 
 
 ## Test de chargement de resource externe via URL d'un named module
@@ -128,6 +148,31 @@ La classe utilisée pour charger la resource appartient à l'application qui ne 
 | 106     | theapp          | lib             | opened directory   | theapp_b, lib_b | KO       |
 
 
+On note que tous les résultats sont KO.
+
+Tout le code source est disponible dans le projet [theapp_b](./theapp_b/).
+
+Code source de la méthode de chargement des ressources (theapp)
+```java
+public class ResourceReader {
+
+    public static String loadAsString(String resourcePath) throws IOException {
+        try (InputStream in = ResourceReader.class.getResourceAsStream(resourcePath);
+             InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)
+        ) {
+            StringBuilder stringBuilder = new StringBuilder();
+            char[] buffer = new char[1000];
+            int size;
+            while ((size = reader.read(buffer)) >= 0) {
+                stringBuilder.append(buffer, 0, size);
+            }
+            return stringBuilder.toString();
+        }
+    }
+}
+```
+
+Il faut noter l'utilisation du classloader de la classe ResourceReader qui appartient au module theappb. 
 
 
 ## Test de chargement de resource externe via URL d'un named module depuis le classloader du module
@@ -147,6 +192,31 @@ La classe utilisée pour charger la resource appartient à la librairie qui cont
 On constate que cela fonctionne dans les deux cas où le package et le répertoire ont été indiqués comme open. 
 
 
+Tout le code source est disponible dans le projet [theapp_c](./theapp_c/).
+
+Code source de la méthode de chargement des ressources (theapp)
+```java
+public class ResourceReader {
+
+    public static String loadAsString(String resourcePath) throws IOException {
+        try (InputStream in = Sample.class.getResourceAsStream(resourcePath);
+             InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)
+        ) {
+            StringBuilder stringBuilder = new StringBuilder();
+            char[] buffer = new char[1000];
+            int size;
+            while ((size = reader.read(buffer)) >= 0) {
+                stringBuilder.append(buffer, 0, size);
+            }
+            return stringBuilder.toString();
+        }
+    }
+}
+```
+
+Il faut noter l'utilisation du classloader de la classe Sample qui appartient au module *lib*.
+
+
 ## Test de chargement de resource externe via URL d'un named module depuis le classloader du module via une méthode d'un module unnamed 
 Cette série de tests portent sur le cas d'une application 'named module' qui charge des ressources externes dans un
 'named module'.
@@ -155,14 +225,34 @@ Cette série de tests portent sur le cas d'une application 'named module' qui ch
 
 | Test ID | Resource loader | Resource module | Resource path      | Projets         | Résultat |
 |---------|-----------------|-----------------|--------------------|-----------------|----------|
-| 201     | theapp          | lib             | root package       | theapp_d, lib_b | KO       |
-| 202     | theapp          | lib             | exported package   | theapp_d, lib_b | KO       |
-| 203     | theapp          | lib             | internal package   | theapp_d, lib_b | KO       |
-| 204     | theapp          | lib             | opened package     | theapp_d, lib_b | KO       |
-| 205     | theapp          | lib             | internal directory | theapp_d, lib_b | KO       |
-| 206     | theapp          | lib             | opened directory   | theapp_d, lib_b | KO       |
+| 301     | theapp          | lib             | root package       | theapp_d, lib_b | KO       |
+| 302     | theapp          | lib             | exported package   | theapp_d, lib_b | KO       |
+| 303     | theapp          | lib             | internal package   | theapp_d, lib_b | KO       |
+| 304     | theapp          | lib             | opened package     | theapp_d, lib_b | KO       |
+| 305     | theapp          | lib             | internal directory | theapp_d, lib_b | KO       |
+| 306     | theapp          | lib             | opened directory   | theapp_d, lib_b | KO       |
 
 On constate que cela ne fonctionne dans aucun cas.
+
+
+Tout le code source est disponible dans le projet [theapp_d](./theapp_d/).
+
+Code source de la méthode de chargement des ressources (theapp)
+```java
+public class ResourceReader {
+
+    public static String loadAsString(String resourcePath) throws IOException {
+        return IOUtils.resourceToString(resourcePath, StandardCharsets.UTF_8, Sample.class.getClassLoader());
+    }
+
+}
+```
+
+Il faut noter l'utilisation du classloader de la classe Sample qui appartient au module *lib* et d'une librairie *unnamed*.
+Le code à l'intérieur utilise la méthode ```URL getResource(String)``` de la classe *ClassLoader*.
+Cette méthode retourne toujours null même au sein de la librairie contenant la ressource.
+Donc, il s'agit de la méthode employée qui ne fonctionne pas.
+
 
 
 ## Test de chargement de resource externe via InputSteam d'un named module depuis le classloader du module via une méthode d'un module unnamed
@@ -173,14 +263,36 @@ Cette série de tests portent sur le cas d'une application 'named module' qui ch
 
 | Test ID | Resource loader | Resource module | Resource path      | Projets         | Résultat |
 |---------|-----------------|-----------------|--------------------|-----------------|----------|
-| 201     | theapp          | lib             | root package       | theapp_e, lib_b | KO       |
-| 202     | theapp          | lib             | exported package   | theapp_e, lib_b | KO       |
-| 203     | theapp          | lib             | internal package   | theapp_e, lib_b | KO       |
-| 204     | theapp          | lib             | opened package     | theapp_e, lib_b | KO       |
-| 205     | theapp          | lib             | internal directory | theapp_e, lib_b | KO       |
-| 206     | theapp          | lib             | opened directory   | theapp_e, lib_b | KO       |
+| 401     | theapp          | lib             | root package       | theapp_e, lib_b | KO       |
+| 402     | theapp          | lib             | exported package   | theapp_e, lib_b | KO       |
+| 403     | theapp          | lib             | internal package   | theapp_e, lib_b | KO       |
+| 404     | theapp          | lib             | opened package     | theapp_e, lib_b | KO       |
+| 405     | theapp          | lib             | internal directory | theapp_e, lib_b | KO       |
+| 406     | theapp          | lib             | opened directory   | theapp_e, lib_b | KO       |
 
 On constate que cela fonctionne dans les deux cas où le package et le répertoire ont été indiqués comme open.
+
+Tout le code source est disponible dans le projet [theapp_e](./theapp_e/).
+
+Code source de la méthode de chargement des ressources (theapp)
+```java
+public class ResourceReader {
+    public static String loadAsString(String resourcePath) throws IOException {
+        try (InputStream in = Sample.class.getResourceAsStream(resourcePath)) {
+            return IOUtils.toString(in, StandardCharsets.UTF_8);
+        }
+    }
+
+}
+```
+
+Il faut noter l'utilisation du classloader de la classe Sample qui appartient au module *lib*, d'une librairie *unnamed*, et l'utilisation de InputStream.
+
+
+## Fonctionnement de l'utilisation de ClassLoader#getResource
+
+### Utilisation dans un module applicatif en local
+
 
 
 ## Sources
