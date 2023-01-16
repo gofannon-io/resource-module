@@ -31,12 +31,15 @@ public class HelloAppF {
         System.out.println("ExportedSample Class URL: " + ExportedSample.class.getResource("/com/example/resource_module/lib_b/shared/resource-7.txt"));
 
         boolean loaded;
-        try (InputStream ignored = sharedSample.getResourceAsStream()) {
+        String content2=null;
+        try (InputStream in = sharedSample.getResourceAsStream()) {
             loaded = true;
+            content2 = IOUtils.toString(in, StandardCharsets.UTF_8);
         } catch (Exception ex) {
             loaded = false;
         }
         System.out.println("Shared loaded: " + loaded);
+        System.out.println("Shared content loaded: " + content2);
 
 
         boolean sameClassLoader = ExportedSample.class.getClassLoader() == sharedSample.getClassLoader();
