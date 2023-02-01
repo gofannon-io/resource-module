@@ -1,1 +1,1 @@
-Resource in root package
+Resource in root package of application

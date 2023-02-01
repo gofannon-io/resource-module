@@ -20,3 +20,10 @@ dependencies {
     implementation "commons-io:commons-io:2.11.0"
     implementation project(":lib_b")
 }
+
+jar {
+    manifest {
+        attributes("Implementation-Title": "Integer",
+                "Implementation-Version": "32")
+    }
+}

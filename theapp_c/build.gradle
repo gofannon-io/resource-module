@@ -17,6 +17,6 @@ application {
 }
 
 dependencies {
-    //implementation "commons-io:commons-io:2.11.0"
+    //implementation "com.example.resource_module:lib_b:1.0"
     implementation project(":lib_b")
 }

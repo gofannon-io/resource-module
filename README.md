@@ -1,7 +1,13 @@
 # resource-module
 
 ## Aperçu
-Cet article regroupe un ensemble de tests pour comprendre la gestion des resources dans des projets java avec des modules.
+Cet article constitue une étude pour comprendre la gestion des resources dans des projets java avec des modules.
+
+Les analyses sont menées par la documentation et surtout les résultats sont issus directement de programme de tests dont 
+les sources sont en copie.
+
+L'objectif est de fournir une liste exhaustive des moyens d'accès à une ressource et les localisations possibles d'une 
+ressource et si l'accès a été possible ou pas. 
 
 
 ## La documentation officielle (Javadoc) 
@@ -43,11 +49,6 @@ Cet extrait présente le concept de ressource et l'algorithme permettant d'ident
 
 
 
-
-
-
-
-
 ## Objectifs détaillés
 
 L'accès à une resource est conditionné par 3 facteurs :
@@ -78,41 +79,30 @@ error: package is empty or does not exist
 ```
 
 
+## Matrices d'accès aux ressources
 
-| Test ID | Resource loader | Resource module | Resource path    | Projets         | Résultat |
-|---------|-----------------|-----------------|------------------|-----------------|----------|
-| 005     | commons-io      | theapp          | root package     | theapp_b        | KO       |
-| 006     | commons-io      | theapp          | exported package | theapp_b        | KO       |
-| 007     | commons-io      | theapp          | internal package | theapp_b        | KO       |
-| 008     | commons-io      | theapp          | opened package   | theapp_b        | KO       |
-| 009     | theapp          | lib             | root package     | theapp_c, lib_d | KO       |
-| 010     | theapp          | lib             | exported package | theapp_c, lib_d | KO       |
-| 011     | theapp          | lib             | internal package | theapp_c, lib_d | KO       |
-| 012     | theapp          | lib             | opened package   | theapp_c, lib_d | KO       |
+### Série de tests A&nbsp;:
+* resource loader : application class
+* resource module : application
+
+Cette série de tests permet juste de vérifier le bon fonctionnement de la méthode de chargement de ressources.
 
 
-
-
-## Tests de chargement de ressource locale via URL d'un named module
-Cette série de tests portent sur le cas d'une application 'named module' qui charge des ressources locales (ie dans le JAR courant).
-
-Les tests à effectuer étant locaux, ils sont assez simples&nbsp;:
-
-| Test ID | Resource loader | Resource module | Resource path      | Projets         | Résultat |
-|---------|-----------------|-----------------|--------------------|-----------------|----------|
-| 001     | theapp          | theapp          | root package       | theapp_a        | OK       |
-| 002     | theapp          | theapp          | exported package   | theapp_a        | OK       |
-| 003     | theapp          | theapp          | internal package   | theapp_a        | OK       |
-| 004     | theapp          | theapp          | opened package     | theapp_a        | OK       |
-| 005     | theapp          | theapp          | internal directory | theapp_a        | OK       |
-| 006     | theapp          | theapp          | opened directory   | theapp_a        | OK       |
+| Test ID | Resource loader   | Resource module | Resource path      |  Résultat |
+|---------|-------------------|-----------------|--------------------|-----------|
+| A01     | application class | application     | root package       |  OK       |
+| A02     | application class | application     | exported package   |  OK       |
+| A03     | application class | application     | internal package   |  OK       |
+| A04     | application class | application     | opened package     |  OK       |
+| A05     | application class | application     | internal directory |  OK       |
+| A06     | application class | application     | opened directory   |  OK       |
 
 On note que tous les résultats sont OK, car la notion de module n'a pas cours au sein d'un même module.
 
-Tout le code source est disponible dans le projet [theapp_a](./theapp_a/).
-
-Code source de la méthode de chargement des ressources (theapp)
+Le code source est le suivant :
 ```java
+package com.example.resource_module.theapp;
+
 public class ResourceReader {
 
     public static String loadAsString(String resourcePath) throws IOException {
@@ -131,29 +121,29 @@ public class ResourceReader {
 }
 ```
 
-
-## Test de chargement de resource externe via URL d'un named module
-Cette série de tests portent sur le cas d'une application 'named module' qui charge des ressources externes dans un 
-'named module'.
-La classe utilisée pour charger la resource appartient à l'application qui ne contient pas la resource.
+Le détail est disponible [ici](documentation/tsa_local_resource_loading_url_named-module.md)
 
 
-| Test ID | Resource loader | Resource module | Resource path      | Projets         | Résultat |
-|---------|-----------------|-----------------|--------------------|-----------------|----------|
-| 101     | theapp          | lib             | root package       | theapp_b, lib_b | KO       |
-| 102     | theapp          | lib             | exported package   | theapp_b, lib_b | KO       |
-| 103     | theapp          | lib             | internal package   | theapp_b, lib_b | KO       |
-| 104     | theapp          | lib             | opened package     | theapp_b, lib_b | KO       |
-| 105     | theapp          | lib             | internal directory | theapp_b, lib_b | KO       |
-| 106     | theapp          | lib             | opened directory   | theapp_b, lib_b | KO       |
 
+### Série de tests B&nbsp;:
+* resource loader : application class
+* resource module : library
 
-On note que tous les résultats sont KO.
+| Test ID | Resource loader   | Resource module | Resource path      |  Résultat |
+|---------|-------------------|-----------------|--------------------|-----------|
+| B01     | application class | library         | root package       |  KO       |
+| B02     | application class | library         | exported package   |  KO       |
+| B03     | application class | library         | internal package   |  KO       |
+| B04     | application class | library         | opened package     |  KO       |
+| B05     | application class | library         | internal directory |  KO       |
+| B06     | application class | library         | opened directory   |  KO       |
 
-Tout le code source est disponible dans le projet [theapp_b](./theapp_b/).
+On constate que tous les résultats sont KO.
 
-Code source de la méthode de chargement des ressources (theapp)
-```java
+Le code source est le suivant :
+```Java
+package com.example.resource_module.theapp;
+//[...]
 public class ResourceReader {
 
     public static String loadAsString(String resourcePath) throws IOException {
@@ -170,128 +160,145 @@ public class ResourceReader {
         }
     }
 }
+
+
 ```
 
-Il faut noter l'utilisation du classloader de la classe ResourceReader qui appartient au module theappb. 
-
-
-## Test de chargement de resource externe via URL d'un named module depuis le classloader du module
-Cette série de tests portent sur le cas d'une application 'named module' qui charge des ressources externes dans un
-'named module'.
-La classe utilisée pour charger la resource appartient à la librairie qui contient la resource.
-
-| Test ID | Resource loader | Resource module | Resource path      | Projets         | Résultat |
-|---------|-----------------|-----------------|--------------------|-----------------|----------|
-| 201     | theapp          | lib             | root package       | theapp_c, lib_b | KO       |
-| 202     | theapp          | lib             | exported package   | theapp_c, lib_b | KO       |
-| 203     | theapp          | lib             | internal package   | theapp_c, lib_b | KO       |
-| 204     | theapp          | lib             | opened package     | theapp_c, lib_b | OK       |
-| 205     | theapp          | lib             | internal directory | theapp_c, lib_b | KO       |
-| 206     | theapp          | lib             | opened directory   | theapp_c, lib_b | OK       |
-
-On constate que cela fonctionne dans les deux cas où le package et le répertoire ont été indiqués comme open. 
-
-
-Tout le code source est disponible dans le projet [theapp_c](./theapp_c/).
-
-Code source de la méthode de chargement des ressources (theapp)
-```java
-public class ResourceReader {
-
-    public static String loadAsString(String resourcePath) throws IOException {
-        try (InputStream in = Sample.class.getResourceAsStream(resourcePath);
-             InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)
-        ) {
-            StringBuilder stringBuilder = new StringBuilder();
-            char[] buffer = new char[1000];
-            int size;
-            while ((size = reader.read(buffer)) >= 0) {
-                stringBuilder.append(buffer, 0, size);
-            }
-            return stringBuilder.toString();
-        }
-    }
-}
-```
-
-Il faut noter l'utilisation du classloader de la classe Sample qui appartient au module *lib*.
-
-
-## Test de chargement de resource externe via URL d'un named module depuis le classloader du module via une méthode d'un module unnamed 
-Cette série de tests portent sur le cas d'une application 'named module' qui charge des ressources externes dans un
-'named module'.
+Le détail est disponible [ici](documentation/tsb_external_resource_loading_url_named-module.md)
 
 
 
-| Test ID | Resource loader | Resource module | Resource path      | Projets         | Résultat |
-|---------|-----------------|-----------------|--------------------|-----------------|----------|
-| 301     | theapp          | lib             | root package       | theapp_d, lib_b | KO       |
-| 302     | theapp          | lib             | exported package   | theapp_d, lib_b | KO       |
-| 303     | theapp          | lib             | internal package   | theapp_d, lib_b | KO       |
-| 304     | theapp          | lib             | opened package     | theapp_d, lib_b | KO       |
-| 305     | theapp          | lib             | internal directory | theapp_d, lib_b | KO       |
-| 306     | theapp          | lib             | opened directory   | theapp_d, lib_b | KO       |
-
-On constate que cela ne fonctionne dans aucun cas.
+### Série de tests C&nbsp;:
+* resource loader : library class
+* resource module : library
 
 
-Tout le code source est disponible dans le projet [theapp_d](./theapp_d/).
-
-Code source de la méthode de chargement des ressources (theapp)
-```java
-public class ResourceReader {
-
-    public static String loadAsString(String resourcePath) throws IOException {
-        return IOUtils.resourceToString(resourcePath, StandardCharsets.UTF_8, Sample.class.getClassLoader());
-    }
-
-}
-```
-
-Il faut noter l'utilisation du classloader de la classe Sample qui appartient au module *lib* et d'une librairie *unnamed*.
-Le code à l'intérieur utilise la méthode ```URL getResource(String)``` de la classe *ClassLoader*.
-Cette méthode retourne toujours null même au sein de la librairie contenant la ressource.
-Donc, il s'agit de la méthode employée qui ne fonctionne pas.
-
-
-
-## Test de chargement de resource externe via InputSteam d'un named module depuis le classloader du module via une méthode d'un module unnamed
-Cette série de tests portent sur le cas d'une application 'named module' qui charge des ressources externes dans un
-'named module'.
-
-
-
-| Test ID | Resource loader | Resource module | Resource path      | Projets         | Résultat |
-|---------|-----------------|-----------------|--------------------|-----------------|----------|
-| 401     | theapp          | lib             | root package       | theapp_e, lib_b | KO       |
-| 402     | theapp          | lib             | exported package   | theapp_e, lib_b | KO       |
-| 403     | theapp          | lib             | internal package   | theapp_e, lib_b | KO       |
-| 404     | theapp          | lib             | opened package     | theapp_e, lib_b | KO       |
-| 405     | theapp          | lib             | internal directory | theapp_e, lib_b | KO       |
-| 406     | theapp          | lib             | opened directory   | theapp_e, lib_b | KO       |
+| Test ID | Resource loader | Resource module  | Resource path      | Résultat  |
+|---------|-----------------|------------------|--------------------|-----------|
+| C01     | library class   | library          | root package       | **OK**    |
+| C02     | library class   | library          | exported package   | KO        |
+| C03     | library class   | library          | internal package   | KO        |
+| C04     | library class   | library          | opened package     | **OK**    |
+| C05     | library class   | library          | internal directory | KO        |
+| C06     | library class   | library          | opened directory   | **OK**    |
 
 On constate que cela fonctionne dans les deux cas où le package et le répertoire ont été indiqués comme open.
 
-Tout le code source est disponible dans le projet [theapp_e](./theapp_e/).
-
-Code source de la méthode de chargement des ressources (theapp)
+Le code source est le suivant :
 ```java
+package com.example.resource_module.theapp;
+
+import com.example.resource_module.lib_b.ExportedSample;
+
 public class ResourceReader {
+
     public static String loadAsString(String resourcePath) throws IOException {
-        try (InputStream in = Sample.class.getResourceAsStream(resourcePath)) {
-            return IOUtils.toString(in, StandardCharsets.UTF_8);
+        try (InputStream in = ExportedSample.class.getResourceAsStream(resourcePath);
+             InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)
+        ) {
+            StringBuilder stringBuilder = new StringBuilder();
+            char[] buffer = new char[1000];
+            int size;
+            while ((size = reader.read(buffer)) >= 0) {
+                stringBuilder.append(buffer, 0, size);
+            }
+            return stringBuilder.toString();
         }
     }
-
 }
 ```
 
-Il faut noter l'utilisation du classloader de la classe Sample qui appartient au module *lib*, d'une librairie *unnamed*, et l'utilisation de InputStream.
+Le détail est disponible [ici](documentation/tsc_external_resource_loading_url_named-module_local-classloader.md)
 
 
-## Fonctionnement de l'utilisation de ClassLoader#getResource
 
-### Utilisation dans un module applicatif en local
+### Série de tests D&nbsp;:
+* resource loader : library classloader
+* resource module : library
+
+| Test ID | Resource loader     | Resource module | Resource path      | Résultat |
+|---------|---------------------|-----------------|--------------------|----------|
+| D01     | library classloader | library         | root package       | KO       |
+| D02     | library classloader | library         | exported package   | KO       |
+| D03     | library classloader | library         | internal package   | KO       |
+| D04     | library classloader | library         | opened package     | KO       |
+| D05     | library classloader | library         | internal directory | KO       |
+| D06     | library classloader | library         | opened directory   | KO       |
+
+On constate que rien ne fonctionne.
+D'une manière générale, le ClassLoader de la librairie ne permet pas de charger les ressources, alors qu'une classe 
+chargée par ce ClassLoader le peut.  
+
+
+Le code source est le suivant :
+```java
+package com.example.resource_module.theapp;
+
+import com.example.resource_module.lib_b.ExportedSample;
+
+public class ResourceReader {
+
+    public static String loadAsString(String resourcePath) throws IOException {
+        try (InputStream in =  ExportedSample.class.getClassLoader().getResourceAsStream(resourcePath);
+             InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)
+        ) {
+            StringBuilder stringBuilder = new StringBuilder();
+            char[] buffer = new char[1000];
+            int size;
+            while ((size = reader.read(buffer)) >= 0) {
+                stringBuilder.append(buffer, 0, size);
+            }
+            return stringBuilder.toString();
+        }
+    }
+}
+```
+
+## Cas de la ressource dans un "root package"
+
+Le test C01 montre qu'une classe de la librairie peut charger une ressource dans le "root package" de la librairie.
+C'est étonnant, car, avec les modules java :
+* une application avec module ne s'exécute pas quand il existe une classe dans la racine d'un module (module application ou librairie. 
+* il n'est pas possible d'instancier une classe du "root package", que ce soit une classe locale ou une classe dans une librairie
+* le "root package" n'est pas exprimable dans un fichier "module-info.java" 
+
+Message d'erreur affiché à l'exécution quand il y a une classe dans un "root package" (RootLib dans l'exemple) : 
+```text
+Error occurred during initialization of boot layer
+java.lang.module.FindException: Error reading module: [...]\lib_b\build\libs\lib_b-1.0.jar
+Caused by: java.lang.module.InvalidModuleDescriptorException: RootLib.class found in top-level directory (unnamed package not allowed in module)
+
+Caused by: java.lang.module.InvalidModuleDescriptorException: RootLib.class found in top-level directory (unnamed package not allowed in module)
+```
+
+
+Ce n'est probablement pas un bogue, car ce potentiel dysfonctionnement est détectable très facilement.
+La raison est sans doute ailleurs.
+Une hypothèse est la rétro-compatibilité afin d'autoriser pour le chargement de certaines ressources. 
+
+
+
+
+## Conclusion
+
+Les méthodes et contextes permettant de charger une resource dans une librairie sont les suivants :
+
+| Test ID | Resource loader   | Resource module | Resource path      | Résultat           |
+|---------|-------------------|-----------------|--------------------|--------------------|
+| C01     | library class     | library         | root package       | *OK* **(WARNING)** |
+| C04     | library class     | library         | opened package     | OK                 |
+| C06     | library class     | library         | opened directory   | OK                 |
+
+On constate que seules les ressources déclarées dans un package "opened" et chargé depuis une classe de la librairie.
+
+Étonnamment, une ressource placée dans le "root package" d'une librairie est accessible.
+Néanmoins, comme l'usage "root packages" est très restrictif avec les modules Java, le dépôt de ressources en 
+son sein est à proscrire.  
+
+Seul reste le principe suivant :
+
+**Les ressources accessibles à l'extérieur doivent appartenir à un package "opened" et être chargées depuis une classe 
+locale du module (JAR) contenant la ressource.** 
 
 
 
